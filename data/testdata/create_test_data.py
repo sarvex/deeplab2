@@ -133,15 +133,13 @@ def create_test_data(annotation_path):
     train_id, eval_id = tuple(cityscapes_label)
     cityscapes_id = eval_id
     vps_id = train_id * _PANOPTIC_LABEL_DIVISOR
-    if train_id in _CLASS_HAS_INSTANCES_LIST:
-      # `thing` class.
-      if is_crowd != _IS_CROWD:
-        cityscapes_id = (
-            eval_id * _PANOPTIC_LABEL_DIVISOR +
-            num_instances_per_class[train_id])
-        # First instance should have ID 1.
-        vps_id += num_instances_per_class[train_id] + 1
-        num_instances_per_class[train_id] += 1
+    if train_id in _CLASS_HAS_INSTANCES_LIST and is_crowd != _IS_CROWD:
+      cityscapes_id = (
+          eval_id * _PANOPTIC_LABEL_DIVISOR +
+          num_instances_per_class[train_id])
+      # First instance should have ID 1.
+      vps_id += num_instances_per_class[train_id] + 1
+      num_instances_per_class[train_id] += 1
 
     cityscapes_panoptic[selected_pixels] = cityscapes_id
     vps_panoptic[selected_pixels] = vps_id
@@ -174,7 +172,7 @@ def main(argv):
 
   data_path = FLAGS.panoptic_annotation_path  # OSS: removed internal filename loading.
   panoptic_map, vps_map, segments_info = create_test_data(data_path)
-  panoptic_map_filename = _FILENAME_PREFIX + '_gtFine_panoptic.png'
+  panoptic_map_filename = f'{_FILENAME_PREFIX}_gtFine_panoptic.png'
   panoptic_map_path = os.path.join(FLAGS.output_cityscapes_root, 'gtFine',
                                    'cityscapes_panoptic_dummy_trainId',
                                    panoptic_map_filename)
@@ -189,9 +187,9 @@ def main(argv):
 
   json_annotation = {
       'annotations': [{
-          'file_name': _FILENAME_PREFIX + '_gtFine_panoptic.png',
+          'file_name': f'{_FILENAME_PREFIX}_gtFine_panoptic.png',
           'image_id': _FILENAME_PREFIX,
-          'segments_info': segments_info
+          'segments_info': segments_info,
       }]
   }
   json_annotation_path = os.path.join(FLAGS.output_cityscapes_root, 'gtFine',

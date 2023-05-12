@@ -83,7 +83,7 @@ def _get_images(cityscapes_root, dataset_split):
     A list of sorted file names or None when getting label for
       test set.
   """
-  pattern = '*%s.%s' % (_POSTFIX_MAP['image'], _DATA_FORMAT_MAP['image'])
+  pattern = f"*{_POSTFIX_MAP['image']}.{_DATA_FORMAT_MAP['image']}"
   search_files = os.path.join(
       cityscapes_root, _FOLDERS_MAP['image'], dataset_split, '*', pattern)
   filenames = tf.io.gfile.glob(search_files)
@@ -104,13 +104,11 @@ def _split_image_path(image_path):
   path_list = image_path.split(os.sep)
   image_folder, dataset_split, city_name, file_name = path_list[-4:]
   if image_folder != _FOLDERS_MAP['image']:
-    raise ValueError('Expects image path %s containing image folder.'
-                     % image_path)
+    raise ValueError(f'Expects image path {image_path} containing image folder.')
 
-  pattern = '%s.%s' % (_POSTFIX_MAP['image'], _DATA_FORMAT_MAP['image'])
+  pattern = f"{_POSTFIX_MAP['image']}.{_DATA_FORMAT_MAP['image']}"
   if not file_name.endswith(pattern):
-    raise ValueError('Image file name %s should end with %s' %
-                     (file_name, pattern))
+    raise ValueError(f'Image file name {file_name} should end with {pattern}')
 
   file_prefix = file_name[:-len(pattern)]
   return os.sep.join(path_list[:-4]), dataset_split, city_name, file_prefix
@@ -119,15 +117,15 @@ def _split_image_path(image_path):
 def _get_semantic_annotation(image_path):
   cityscapes_root, dataset_split, city_name, file_prefix = _split_image_path(
       image_path)
-  semantic_annotation = '%s%s.%s' % (file_prefix, _POSTFIX_MAP['label'],
-                                     _DATA_FORMAT_MAP['label'])
+  semantic_annotation = (
+      f"{file_prefix}{_POSTFIX_MAP['label']}.{_DATA_FORMAT_MAP['label']}")
   return os.path.join(cityscapes_root, _FOLDERS_MAP['label'], dataset_split,
                       city_name, semantic_annotation)
 
 
 def _get_panoptic_annotation(cityscapes_root, dataset_split,
                              annotation_file_name):
-  panoptic_folder = 'cityscapes_panoptic_%s_trainId' % dataset_split
+  panoptic_folder = f'cityscapes_panoptic_{dataset_split}_trainId'
   return os.path.join(cityscapes_root, _FOLDERS_MAP['label'], panoptic_folder,
                       annotation_file_name)
 
@@ -145,8 +143,10 @@ def _read_segments(cityscapes_root, dataset_split):
       _generate_panoptic_label() method on the detail structure of `segments`.
   """
   json_filename = os.path.join(
-      cityscapes_root, _FOLDERS_MAP['label'],
-      'cityscapes_panoptic_%s_trainId.json' % dataset_split)
+      cityscapes_root,
+      _FOLDERS_MAP['label'],
+      f'cityscapes_panoptic_{dataset_split}_trainId.json',
+  )
   with tf.io.gfile.GFile(json_filename) as f:
     panoptic_dataset = json.load(f)
 
@@ -154,7 +154,7 @@ def _read_segments(cityscapes_root, dataset_split):
   for annotation in panoptic_dataset['annotations']:
     image_id = annotation['image_id']
     if image_id in segments_dict:
-      raise ValueError('Image ID %s already exists' % image_id)
+      raise ValueError(f'Image ID {image_id} already exists')
     annotation_file_name = annotation['file_name']
     segments = annotation['segments_info']
 
@@ -186,8 +186,8 @@ def _generate_panoptic_label(panoptic_annotation_file, segments):
     panoptic_label = data_utils.read_image(f.read())
 
   if panoptic_label.mode != 'RGB':
-    raise ValueError('Expect RGB image for panoptic label, gets %s' %
-                     panoptic_label.mode)
+    raise ValueError(
+        f'Expect RGB image for panoptic label, gets {panoptic_label.mode}')
 
   panoptic_label = np.array(panoptic_label, dtype=np.int32)
   # Cityscapes panoptic map is created by:
@@ -228,7 +228,7 @@ def _generate_panoptic_label(panoptic_annotation_file, segments):
 
 
 def _convert_split_name(dataset_split):
-  return dataset_split + '_fine'
+  return f'{dataset_split}_fine'
 
 
 def _create_semantic_label(image_path):

@@ -33,10 +33,11 @@ class CocoToolsTest(absltest.TestCase):
     scores = np.array([0.8, 0.2, 0.7], dtype=np.float32)
     coco_annotations = coco_tools.ExportSingleImageDetectionMasksToCoco(
         image_id='first_image',
-        category_id_set=set([1, 2, 3]),
+        category_id_set={1, 2, 3},
         detection_classes=classes,
         detection_scores=scores,
-        detection_masks=masks)
+        detection_masks=masks,
+    )
     expected_counts = ['04', '31', '4']
     for i, mask_annotation in enumerate(coco_annotations):
       self.assertEqual(mask_annotation['segmentation']['counts'],
@@ -66,11 +67,12 @@ class CocoToolsTest(absltest.TestCase):
     # Tests exporting without passing in is_crowd (for backward compatibility).
     coco_annotations = coco_tools.ExportSingleImageGroundtruthToCoco(
         image_id='first_image',
-        category_id_set=set([1, 2, 3]),
+        category_id_set={1, 2, 3},
         next_annotation_id=next_annotation_id,
         groundtruth_boxes=boxes,
         groundtruth_classes=classes,
-        groundtruth_masks=masks)
+        groundtruth_masks=masks,
+    )
     for i, annotation in enumerate(coco_annotations):
       self.assertEqual(annotation['segmentation']['counts'],
                        expected_counts[i])
@@ -84,12 +86,13 @@ class CocoToolsTest(absltest.TestCase):
     # Tests exporting with is_crowd.
     coco_annotations = coco_tools.ExportSingleImageGroundtruthToCoco(
         image_id='first_image',
-        category_id_set=set([1, 2, 3]),
+        category_id_set={1, 2, 3},
         next_annotation_id=next_annotation_id,
         groundtruth_boxes=boxes,
         groundtruth_classes=classes,
         groundtruth_masks=masks,
-        groundtruth_is_crowd=is_crowd)
+        groundtruth_is_crowd=is_crowd,
+    )
     for i, annotation in enumerate(coco_annotations):
       self.assertEqual(annotation['segmentation']['counts'],
                        expected_counts[i])

@@ -414,8 +414,7 @@ def distort_image_with_autoaugment(image,
   if augmentation_name:
     available_policies = autoaugment_policy.available_policies
     if augmentation_name not in available_policies:
-      raise ValueError(
-          'Invalid augmentation_name: {}'.format(augmentation_name))
+      raise ValueError(f'Invalid augmentation_name: {augmentation_name}')
     policy = available_policies[augmentation_name]
     return build_and_apply_autoaugment_policy(
         policy, image, label, ignore_label)

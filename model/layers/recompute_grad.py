@@ -52,9 +52,10 @@ def get_variable_by_name(var_name):
       return var_name == var.op.name
     except AttributeError:
       return False
+
   candidate_vars = list(filter(_replica_filter, all_global_vars))
 
-  if len(candidate_vars) >= 1:
+  if candidate_vars:
     # Filter out non-trainable variables.
     candidate_vars = [v for v in candidate_vars if v.trainable]
   else:
@@ -173,7 +174,7 @@ def _force_data_dependency(
 
   def _first_element(x):
     if x.shape.ndims is None:
-      raise ValueError('Rank of Tensor %s must be known' % x)
+      raise ValueError(f'Rank of Tensor {x} must be known')
     ndims = x.shape.ndims
     begin = tf.zeros(ndims, dtype=tf.int32)
     size = tf.ones(ndims, dtype=tf.int32)

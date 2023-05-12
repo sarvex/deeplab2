@@ -45,7 +45,7 @@ class BuildCOCODataTest(tf.test.TestCase):
                                      [self.split]['label'])
     tf.io.gfile.makedirs(panoptic_map_path)
     panoptic_map_path = os.path.join(panoptic_map_path,
-                                     'panoptic_%s2017' % self.split)
+                                     f'panoptic_{self.split}2017')
 
     tf.io.gfile.makedirs(image_path)
     tf.io.gfile.makedirs(panoptic_map_path)
@@ -139,10 +139,11 @@ class BuildCOCODataTest(tf.test.TestCase):
             }
         ]
     }
-    json_annotation_path = os.path.join(self.data_dir,
-                                        build_coco_data._FOLDERS_MAP
-                                        [self.split]['label'],
-                                        'panoptic_%s2017.json' % self.split)
+    json_annotation_path = os.path.join(
+        self.data_dir,
+        build_coco_data._FOLDERS_MAP[self.split]['label'],
+        f'panoptic_{self.split}2017.json',
+    )
     with tf.io.gfile.GFile(json_annotation_path, 'w') as f:
       json.dump(json_annotation, f, indent=2)
 

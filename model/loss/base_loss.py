@@ -116,8 +116,7 @@ def compute_mask_dice_loss(y_true: tf.Tensor,
   intersection = 2 * tf.reduce_sum(y_pred_flat * y_true_flat, axis=1) + smooth
   denominator = (tf.reduce_sum(y_pred_flat, axis=1) +
                  tf.reduce_sum(y_true_flat, axis=1) + smooth)
-  loss = 1. - tf.math.divide_no_nan(intersection, denominator)
-  return loss
+  return 1. - tf.math.divide_no_nan(intersection, denominator)
 
 
 def mean_absolute_error(y_true: tf.Tensor,

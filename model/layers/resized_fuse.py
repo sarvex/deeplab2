@@ -90,7 +90,7 @@ class ResizedFuse(tf.keras.layers.Layer):
         # summation before relu and after bn (following ResNet bottleneck
         # design). This ordering makes it easier to implement. Besides, it
         # avoids using many 1x1 convolutions when the input has a correct shape.
-        current_name = '_strided_conv_bn{}'.format(index + 1)
+        current_name = f'_strided_conv_bn{index + 1}'
         utils.safe_setattr(
             self, current_name, convolutions.Conv2DSame(
                 self._num_channels, 1, current_name[1:],
@@ -106,7 +106,7 @@ class ResizedFuse(tf.keras.layers.Layer):
         # perform a flexible operation as follows. We first project the feature
         # to the desired number of channels, and then bilinearly resize the
         # output to the desired spatial resolution.
-        current_name = '_resized_conv_bn{}'.format(index + 1)
+        current_name = f'_resized_conv_bn{index + 1}'
         utils.safe_setattr(
             self, current_name, convolutions.Conv2DSame(
                 self._num_channels, 1, current_name[1:],
@@ -144,12 +144,12 @@ class ResizedFuse(tf.keras.layers.Layer):
             align_corners=True))
       elif ((feature_height + 1) // 2 == self._height and
             (feature_width + 1) // 2 == self._width):
-        current_name = '_strided_conv_bn{}'.format(index + 1)
+        current_name = f'_strided_conv_bn{index + 1}'
         feature = self._activation_fn(feature)
         feature = getattr(self, current_name)(feature, training=training)
         output_features.append(feature)
       else:
-        current_name = '_resized_conv_bn{}'.format(index + 1)
+        current_name = f'_resized_conv_bn{index + 1}'
         feature = self._activation_fn(feature)
         feature = getattr(self, current_name)(feature, training=training)
         output_features.append(utils.resize_bilinear(

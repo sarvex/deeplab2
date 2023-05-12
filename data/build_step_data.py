@@ -218,9 +218,7 @@ def _create_panoptic_tfexample(image_path: str,
   """
   with tf.io.gfile.GFile(image_path, 'rb') as f:
     image_data = f.read()
-  label_data = None
-  if not is_testing:
-    label_data = _decode_panoptic_map(panoptic_map_path)
+  label_data = None if is_testing else _decode_panoptic_map(panoptic_map_path)
   image_name = os.path.basename(image_path)
   image_format = image_name.split('.')[1].lower()
   sequence_id, frame_id = _get_image_info_from_path(image_path)
@@ -277,8 +275,12 @@ def _convert_dataset(step_root: str,
       for image_path in image_list:
         sequence_id, image_id = _get_image_info_from_path(image_path)
         panoptic_map_path = os.path.join(
-            step_root, _PANOPTIC_MAP_FOLDER_NAME, dataset_split, sequence_id,
-            '%s.%s' % (image_id, _LABEL_MAP_FORMAT))
+            step_root,
+            _PANOPTIC_MAP_FOLDER_NAME,
+            dataset_split,
+            sequence_id,
+            f'{image_id}.{_LABEL_MAP_FORMAT}',
+        )
         example = _create_panoptic_tfexample(image_path, panoptic_map_path,
                                              use_two_frames, is_testing)
         tfrecord_writer.write(example.SerializeToString())

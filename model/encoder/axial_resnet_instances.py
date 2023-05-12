@@ -37,10 +37,7 @@ from deeplab2.model.encoder import axial_resnet
 
 def _get_default_config():
   """Gets the default config for Axial-ResNets."""
-  # The default config dictionary for an Axial-ResNet is the MaX-DeepLab-S
-  # architecture for panoptic segmentation. This default config dictionary also
-  # exactly matches the default arguments of the functions.
-  default_config = {
+  return {
       'num_blocks': [3, 4, 6, 3],
       'backbone_layer_multiplier': 1.0,
       'width_multiplier': 1.0,
@@ -105,7 +102,6 @@ def _get_default_config():
       'bn_layer': tf.keras.layers.BatchNormalization,
       'conv_kernel_weight_decay': 0.0,
   }
-  return default_config
 
 
 def override(config_dict, override_dict):
@@ -477,7 +473,7 @@ def get_model(name, **kwargs):
     return ResNet50(name_lower, **kwargs)
   elif name_lower == 'resnet50_beta':
     return ResNet50Beta(name_lower, **kwargs)
-  elif name_lower == 'swidernet' or name_lower == 'wide_resnet41':
+  elif name_lower in ['swidernet', 'wide_resnet41']:
     return SWideRNet(name_lower, **kwargs)
   elif name_lower == 'axial_swidernet':
     return AxialSWideRNet(name_lower, **kwargs)
@@ -490,4 +486,4 @@ def get_model(name, **kwargs):
   elif name_lower == 'axial_deeplab_l':
     return AxialDeepLabL(name_lower, **kwargs)
   else:
-    raise ValueError(name_lower + ' is not supported.')
+    raise ValueError(f'{name_lower} is not supported.')

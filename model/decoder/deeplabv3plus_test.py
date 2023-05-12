@@ -53,9 +53,7 @@ class Deeplabv3PlusTest(tf.test.TestCase):
         decoder_output_channels=64,
         atrous_rates=[6, 12, 18],
         num_classes=80)
-    input_dict = dict()
-    input_dict['in_feature_dict'] = tf.random.uniform(shape=(2, 65, 65, 32))
-
+    input_dict = {'in_feature_dict': tf.random.uniform(shape=(2, 65, 65, 32))}
     with self.assertRaises(KeyError):
       _ = deeplabv3plus_decoder(input_dict)
 
@@ -70,8 +68,7 @@ class Deeplabv3PlusTest(tf.test.TestCase):
           decoder_output_channels=128,
           atrous_rates=[6, 12, 18],
           num_classes=num_classes)
-      input_dict = dict()
-      input_dict['high'] = tf.random.uniform(shape=(2, 65, 65, 32))
+      input_dict = {'high': tf.random.uniform(shape=(2, 65, 65, 32))}
       input_dict['low'] = tf.random.uniform(shape=(2, 129, 129, 16))
       expected_shape = [2, 129, 129, num_classes]
 
@@ -89,8 +86,7 @@ class Deeplabv3PlusTest(tf.test.TestCase):
         decoder_output_channels=64,
         atrous_rates=[6, 12, 18],
         num_classes=80)
-    input_dict = dict()
-    input_dict['high'] = tf.random.uniform(shape=(2, 65, 65, 32))
+    input_dict = {'high': tf.random.uniform(shape=(2, 65, 65, 32))}
     input_dict['low'] = tf.random.uniform(shape=(2, 129, 129, 16))
 
     reference_logits_tensor = deeplabv3plus_decoder(
@@ -118,8 +114,7 @@ class Deeplabv3PlusTest(tf.test.TestCase):
 
   @test_utils.test_all_strategies
   def test_deeplabv3plus_sync_bn(self, strategy):
-    input_dict = dict()
-    input_dict['high'] = tf.random.uniform(shape=(2, 65, 65, 32))
+    input_dict = {'high': tf.random.uniform(shape=(2, 65, 65, 32))}
     input_dict['low'] = tf.random.uniform(shape=(2, 129, 129, 16))
     with strategy.scope():
       for bn_layer in test_utils.NORMALIZATION_LAYERS:

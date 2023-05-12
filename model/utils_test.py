@@ -45,10 +45,9 @@ class UtilsTest(tf.test.TestCase):
                                                       target_size)
 
     self.assertListEqual(resized_logits.shape.as_list(), [1, 5, 5, 2])
-    for i in range(5):
-      for j in range(5):
-        np.testing.assert_array_almost_equal(resized_logits.numpy()[0, i, j, :],
-                                             [4 - i, 4 - j])
+    for i, j in itertools.product(range(5), range(5)):
+      np.testing.assert_array_almost_equal(resized_logits.numpy()[0, i, j, :],
+                                           [4 - i, 4 - j])
 
   def test_zero_padding(self):
     input_tensor = tf.ones(shape=(2, 5, 5, 2))

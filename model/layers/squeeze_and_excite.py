@@ -82,8 +82,7 @@ class SimplifiedSqueezeAndExcite(tf.keras.layers.Layer):
     """
     pooled = tf.reduce_mean(input_tensor, [1, 2], keepdims=True)
     squeezed = self._se_conv(pooled)
-    excited = self._hard_sigmoid(squeezed) * input_tensor
-    return excited
+    return self._hard_sigmoid(squeezed) * input_tensor
 
   def get_config(self):
     config = {
@@ -166,7 +165,8 @@ class SqueezeAndExcite(tf.keras.layers.Layer):
         kernel_initializer=self._kernel_initializer,
         kernel_regularizer=self._kernel_regularizer,
         bias_regularizer=self._bias_regularizer,
-        name=name + '_reduce')
+        name=f'{name}_reduce',
+    )
 
     self._se_expand = tf.keras.layers.Conv2D(
         filters=self._out_filters,
@@ -177,7 +177,8 @@ class SqueezeAndExcite(tf.keras.layers.Layer):
         kernel_initializer=self._kernel_initializer,
         kernel_regularizer=self._kernel_regularizer,
         bias_regularizer=self._bias_regularizer,
-        name=name + '_expand')
+        name=f'{name}_expand',
+    )
 
   def call(self, inputs):
     x = tf.reduce_mean(inputs, self._spatial_axis, keepdims=True)

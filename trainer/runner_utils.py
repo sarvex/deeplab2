@@ -35,10 +35,9 @@ def _load_tf_model_garden_vision_checkpoint(initial_checkpoint):
   # DeepLab model variables that start with "_encoder".
   checkpoint_reader = tf.train.load_checkpoint(initial_checkpoint)
   variable_to_shape_map = checkpoint_reader.get_variable_to_shape_map()
-  for variable in variable_to_shape_map:
-    if variable.startswith('backbone/_encoder/'):
-      return True
-  return False
+  return any(
+      variable.startswith('backbone/_encoder/')
+      for variable in variable_to_shape_map)
 
 
 def maybe_load_checkpoint(initial_checkpoint: Union[str, None],
@@ -179,8 +178,8 @@ def check_if_variable_in_backbone(
     return True
   # The variable is part of a max_deeplab encoder.
   # Return false for excluded keywords.
-  if any([axial_block_groups.TRANSFORMER in variable.name,
-          axial_resnet.EXTRA in variable.name,
-          axial_resnet.MEMORY_FEATURE in variable.name]):
-    return False
-  return True
+  return not any([
+      axial_block_groups.TRANSFORMER in variable.name,
+      axial_resnet.EXTRA in variable.name,
+      axial_resnet.MEMORY_FEATURE in variable.name,
+  ])

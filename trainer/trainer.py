@@ -93,8 +93,9 @@ def _create_optimizer(
         decay_steps=solver_config.training_number_of_steps,
         alpha=0.0)
   else:
-    raise ValueError('Learning rate policy %s is not supported.' %
-                     solver_config.learning_policy)
+    raise ValueError(
+        f'Learning rate policy {solver_config.learning_policy} is not supported.'
+    )
 
   if solver_config.warmup_steps:
     lr_scheduler = WarmUp(
@@ -110,7 +111,7 @@ def _create_optimizer(
     return tf.keras.optimizers.SGD(learning_rate=lr_scheduler,
                                    momentum=0.9)
 
-  raise ValueError('Optimizer %s is not supported.' % solver_config.optimizer)
+  raise ValueError(f'Optimizer {solver_config.optimizer} is not supported.')
 
 
 class Trainer(orbit.StandardTrainer):
@@ -260,10 +261,10 @@ class Trainer(orbit.StandardTrainer):
       A dictionary of `Tensors`, which will be written to logs and as
       TensorBoard summaries.
     """
-    train_logs = {}
-    for loss_metric in self._train_loss_metric_dict.values():
-      train_logs['losses/' + loss_metric.name] = loss_metric.result()
-
+    train_logs = {
+        f'losses/{loss_metric.name}': loss_metric.result()
+        for loss_metric in self._train_loss_metric_dict.values()
+    }
     if callable(self._optimizer.learning_rate):
       train_logs['learning_rate'] = self._optimizer.learning_rate(
           self._global_step)

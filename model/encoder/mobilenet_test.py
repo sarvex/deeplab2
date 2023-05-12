@@ -47,8 +47,14 @@ class MobilenetTest(tf.test.TestCase, parameterized.TestCase):
 
     for idx, num_filter in enumerate(mobilenet_channels[model_name]):
       self.assertAllEqual(
-          [1, input_size / 2 ** (idx+2), input_size / 2 ** (idx+2), num_filter],
-          endpoints['res'+str(idx+2)].shape.as_list())
+          [
+              1,
+              input_size / 2**(idx + 2),
+              input_size / 2**(idx + 2),
+              num_filter,
+          ],
+          endpoints[f'res{str(idx + 2)}'].shape.as_list(),
+      )
 
   @parameterized.product(
       model_name=['MobileNetV3Small', 'MobileNetV3Large'],
@@ -86,9 +92,8 @@ class MobilenetTest(tf.test.TestCase, parameterized.TestCase):
       expected_shape = [
           batch_size, spatial_shapes[idx], spatial_shapes[idx], num_filters
       ]
-      self.assertAllEqual(
-          expected_shape,
-          endpoints['res'+str(idx+2)].shape.as_list())
+      self.assertAllEqual(expected_shape,
+                          endpoints[f'res{str(idx + 2)}'].shape.as_list())
 
   @parameterized.parameters('MobileNetV3Small', 'MobileNetV3Large')
   def test_mobilenet_reload_weights(self, model_name):

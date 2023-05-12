@@ -262,14 +262,18 @@ def resize_bilinear(images,
   else:
     images = tf.transpose(images, [0, 3, 1, 2])
     images = tf.compat.v1.image.resize_bilinear(
-        images, [channel, size[0]],
+        images,
+        [channel, size[0]],
         align_corners=align_corners,
-        name=name + '_height' if name else None)
+        name=f'{name}_height' if name else None,
+    )
     images = tf.transpose(images, [0, 1, 3, 2])
     images = tf.compat.v1.image.resize_bilinear(
-        images, [channel, size[1]],
+        images,
+        [channel, size[1]],
         align_corners=align_corners,
-        name=name + '_width' if name else None)
+        name=f'{name}_width' if name else None,
+    )
     images = tf.transpose(images, [0, 3, 2, 1])
   return tf.cast(images, dtype)
 
@@ -338,16 +342,15 @@ def get_layer_name(private_attribute_name):
 
 
 def get_stem_current_name(index):
-  return '_basic_block{}'.format(index + 1)
+  return f'_basic_block{index + 1}'
 
 
 def get_low_level_conv_fusion_conv_current_names(index):
-  return ('_low_level_conv{}'.format(index + 1),
-          '_fusion_conv{}'.format(index + 1))
+  return f'_low_level_conv{index + 1}', f'_fusion_conv{index + 1}'
 
 
 def get_conv_bn_act_current_name(index, use_bn, activation):
-  name = '_conv{}'.format(index + 1)
+  name = f'_conv{index + 1}'
   if use_bn:
     name += '_bn'
   if (activation is not None and

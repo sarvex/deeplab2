@@ -277,8 +277,7 @@ class ASPP(tf.keras.layers.Layer):
       x = self._proj_conv_bn_act(input_tensor, training=training)
     else:
       # Apply the ASPP module.
-      results = []
-      results.append(self._conv_bn_act(input_tensor, training=training))
+      results = [self._conv_bn_act(input_tensor, training=training)]
       results.append(self._aspp_conv1(input_tensor, training=training))
       results.append(self._aspp_conv2(input_tensor, training=training))
       results.append(self._aspp_conv3(input_tensor, training=training))

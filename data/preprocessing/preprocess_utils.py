@@ -344,12 +344,9 @@ def process_resize_value(resize_spec):
     resize_spec = (resize_spec[0], resize_spec[0])
 
   if len(resize_spec) != 2:
-    raise ValueError('Unable to process input resize_spec: %s' % resize_spec)
+    raise ValueError(f'Unable to process input resize_spec: {resize_spec}')
 
-  if resize_spec[0] <= 0 or resize_spec[1] <= 0:
-    return None
-
-  return resize_spec
+  return None if resize_spec[0] <= 0 or resize_spec[1] <= 0 else resize_spec
 
 
 def _resize_to_match_min_size(input_shape, min_size):
@@ -432,12 +429,10 @@ def resize_to_range_helper(input_shape, min_size, max_size=None, factor=None):
   """
   output_shape = input_shape
 
-  min_size = process_resize_value(min_size)
-  if min_size:
+  if min_size := process_resize_value(min_size):
     output_shape = _resize_to_match_min_size(input_shape, min_size)
 
-  max_size = process_resize_value(max_size)
-  if max_size:
+  if max_size := process_resize_value(max_size):
     if factor:
       # Update max_size to be a multiple of factor plus 1 and make sure the
       # max dimension after resizing is no larger than max_size.

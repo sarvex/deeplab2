@@ -229,25 +229,20 @@ class MaXDeepLab(tf.keras.layers.Layer):
 
   @property
   def checkpoint_items(self):
-    items = {
-        common.CKPT_SEMANTIC_DECODER:
-            self._auxiliary_semantic_decoder,
+    return {
+        common.CKPT_SEMANTIC_DECODER: self._auxiliary_semantic_decoder,
         common.CKPT_SEMANTIC_HEAD_WITHOUT_LAST_LAYER:
-            self._auxiliary_semantic_head.conv_block,
+        self._auxiliary_semantic_head.conv_block,
         common.CKPT_SEMANTIC_LAST_LAYER:
-            self._auxiliary_semantic_head.final_conv,
-        common.CKPT_PIXEL_SPACE_HEAD:
-            self._pixel_space_head,
-        common.CKPT_TRANSFORMER_MASK_HEAD:
-            self._transformer_mask_head,
-        common.CKPT_TRANSFORMER_CLASS_HEAD:
-            self._transformer_class_head,
+        self._auxiliary_semantic_head.final_conv,
+        common.CKPT_PIXEL_SPACE_HEAD: self._pixel_space_head,
+        common.CKPT_TRANSFORMER_MASK_HEAD: self._transformer_mask_head,
+        common.CKPT_TRANSFORMER_CLASS_HEAD: self._transformer_class_head,
         common.CKPT_PIXEL_SPACE_FEATURE_BATCH_NORM:
-            self._pixel_space_feature_batch_norm,
+        self._pixel_space_feature_batch_norm,
         common.CKPT_PIXEL_SPACE_MASK_BATCH_NORM:
-            self._pixel_space_mask_batch_norm,
+        self._pixel_space_mask_batch_norm,
     }
-    return items
 
   def call(self, features, training=False):
     """Performs a forward pass.
@@ -284,7 +279,7 @@ class MaXDeepLab(tf.keras.layers.Layer):
           features, training=training)
     auxiliary_semantic_results = self._auxiliary_semantic_head(
         semantic_features, training=training)
-    results.update(auxiliary_semantic_results)
+    results |= auxiliary_semantic_results
 
     # Pixel space head.
     pixel_space_feature = self._pixel_space_head(

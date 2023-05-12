@@ -212,5 +212,5 @@ class MotionDeepLabDecoder(tf.keras.layers.Layer):
           common.CKPT_MOTION_REGRESSION_HEAD_LAST_LAYER:
               self._motion_regression_head.final_conv,
       }
-      items.update(instance_items)
+      items |= instance_items
     return items

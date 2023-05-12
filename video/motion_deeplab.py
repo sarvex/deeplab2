@@ -138,21 +138,18 @@ class MotionDeepLab(tf.keras.Model):
 
     pred = self._decoder(
         self._encoder(input_tensor, training=training), training=training)
-    result_dict = dict()
-    for key, value in pred.items():
-      if (key == common.PRED_OFFSET_MAP_KEY or
-          key == common.PRED_FRAME_OFFSET_MAP_KEY):
-        result_dict[key] = utils.resize_and_rescale_offsets(
-            value, [input_h, input_w])
-      else:
-        result_dict[key] = utils.resize_bilinear(
-            value, [input_h, input_w])
-
+    result_dict = {
+        key:
+        utils.resize_and_rescale_offsets(value, [input_h, input_w]) if key in [
+            common.PRED_OFFSET_MAP_KEY, common.PRED_FRAME_OFFSET_MAP_KEY
+        ] else utils.resize_bilinear(value, [input_h, input_w])
+        for key, value in pred.items()
+    }
     # Change the semantic logits to probabilities with softmax.
     result_dict[common.PRED_SEMANTIC_PROBS_KEY] = tf.nn.softmax(
         result_dict[common.PRED_SEMANTIC_LOGITS_KEY])
     if not training:
-      result_dict.update(self._post_processor(result_dict))
+      result_dict |= self._post_processor(result_dict)
 
       next_heatmap, next_centers = self._render_fn(
           result_dict[common.PRED_PANOPTIC_KEY])
@@ -208,5 +205,5 @@ class MotionDeepLab(tf.keras.Model):
   @property
   def checkpoint_items(self) -> Dict[Text, Any]:
     items = dict(encoder=self._encoder)
-    items.update(self._decoder.checkpoint_items)
+    items |= self._decoder.checkpoint_items
     return items

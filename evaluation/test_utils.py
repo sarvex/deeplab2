@@ -72,8 +72,7 @@ def read_segmentation_with_rgb_color_map(
   """
   rgb_image = read_test_image(image_testdata_path, image_format='RGB')
   if len(rgb_image.shape) != 3 or rgb_image.shape[2] != 3:
-    raise AssertionError('Expected RGB image, actual shape is %s' %
-                         (rgb_image.shape,))
+    raise AssertionError(f'Expected RGB image, actual shape is {rgb_image.shape}')
 
   num_pixels = rgb_image.shape[0] * rgb_image.shape[1]
   unique_colors = np.unique(np.reshape(rgb_image, [num_pixels, 3]), axis=0)

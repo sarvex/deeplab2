@@ -273,13 +273,13 @@ class AxialResNet(tf.keras.Model):
           conv_kernel_weight_decay=conv_kernel_weight_decay)
       first_block_index = 1
     else:
-      raise ValueError(backbone_type + ' is not supported.')
+      raise ValueError(f'{backbone_type} is not supported.')
 
     self._first_block_index = first_block_index
     # Apply standard ResNet block groups. We use first_block_index to
     # distinguish models with 4 stages and those with 5 stages.
     for index in range(first_block_index, 5):
-      current_name = '_stage{}'.format(index + 1)
+      current_name = f'_stage{index + 1}'
       utils.safe_setattr(self, current_name, axial_block_groups.BlockGroup(
           filters=filters_list[index],
           num_blocks=num_blocks_list[index],
@@ -328,7 +328,7 @@ class AxialResNet(tf.keras.Model):
       # Now that we have finished building the backbone and no stacked decoder
       # is used in the backbone, so we start to build extra (i.e., non-backbone)
       # layers for panoptic segmentation.
-      current_name = '_stage5_' + EXTRA
+      current_name = f'_stage5_{EXTRA}'
       utils.safe_setattr(
           self, current_name, axial_block_groups.BlockGroup(
               filters=filters_list[-1],
@@ -380,7 +380,7 @@ class AxialResNet(tf.keras.Model):
 
       # Apply a decoder block group for building the backbone.
       if current_is_backbone:
-        current_name = '_decoder_stage{}'.format(decoder_stage)
+        current_name = f'_decoder_stage{decoder_stage}'
         utils.safe_setattr(
             self, current_name, axial_block_groups.BlockGroup(
                 filters=decoder_channels // 4,
@@ -413,7 +413,7 @@ class AxialResNet(tf.keras.Model):
       if not current_is_backbone:
         # Continue building an extra (i.e., non-backbone) decoder for panoptic
         # segmentation.
-        current_name = '_decoder_stage{}_{}'.format(decoder_stage, EXTRA)
+        current_name = f'_decoder_stage{decoder_stage}_{EXTRA}'
         utils.safe_setattr(
             self, current_name, axial_block_groups.BlockGroup(
                 filters=decoder_channels // 4,
@@ -440,7 +440,7 @@ class AxialResNet(tf.keras.Model):
         extra_decoder_use_transformer_beyond_stride):
       # Build extra memory path feed forward networks for the class feature and
       # the mask feature.
-      current_name = '_class_feature_' + EXTRA
+      current_name = f'_class_feature_{EXTRA}'
       utils.safe_setattr(
           self, current_name, convolutions.Conv1D(
               global_feed_forward_network_channels,
@@ -450,7 +450,7 @@ class AxialResNet(tf.keras.Model):
               bn_layer=bn_layer,
               activation=activation,
               conv_kernel_weight_decay=conv_kernel_weight_decay))
-      current_name = '_mask_feature_' + EXTRA
+      current_name = f'_mask_feature_{EXTRA}'
       utils.safe_setattr(
           self, current_name, convolutions.Conv1D(
               global_feed_forward_network_channels,

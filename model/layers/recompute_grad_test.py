@@ -143,9 +143,8 @@ class RecomputeDense(tf.keras.layers.Layer):
     kernels = []
     biases = []
     for i in range(1, len(units)):
-      kernels.append(
-          self.add_weight('kernel_{}'.format(i), (units[i - 1], units[i])))
-      biases.append(self.add_weight('bias_{}'.format(i), (units[i],)))
+      kernels.append(self.add_weight(f'kernel_{i}', (units[i - 1], units[i])))
+      biases.append(self.add_weight(f'bias_{i}', (units[i],)))
     self._kernels = kernels
     self._biases = biases
     super(RecomputeDense, self).build(input_shape)

@@ -166,7 +166,7 @@ class AxialBlock(tf.keras.layers.Layer):
             conv_kernel_weight_decay=conv_kernel_weight_decay,
             **axial_layer_config)
       else:
-        raise ValueError(attention_type + ' is not supported.')
+        raise ValueError(f'{attention_type} is not supported.')
 
       # Here we apply a batch norm with gamma initialized at zero. This ensures
       # that at random initialization of the model, the skip connections

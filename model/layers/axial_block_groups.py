@@ -34,8 +34,8 @@ TRANSFORMER = 'transformer'
 
 
 def _get_current_names(index):
-  current_name = '_block{}'.format(index + 1)
-  transformer_current_name = '_block{}_{}'.format(index + 1, TRANSFORMER)
+  current_name = f'_block{index + 1}'
+  transformer_current_name = f'_block{index + 1}_{TRANSFORMER}'
   return current_name, transformer_current_name
 
 
@@ -239,28 +239,25 @@ class BlockGroup(tf.keras.layers.Layer):
         filters_list = [filters * attention_bottleneck_expansion,
                         filters,
                         filters * 4]
-      elif backbone_type == 'resnet' or backbone_type == 'resnet_beta':
+      elif backbone_type in ['resnet', 'resnet_beta']:
         attention_type = None
         recompute_grad = conv_use_recompute_grad or recompute_grad
         filters_list = [filters,
                         filters,
                         filters * 4]
       elif backbone_type == 'wider_resnet':
+        recompute_grad = conv_use_recompute_grad or recompute_grad
         if original_resnet_input_stride * original_resnet_stride < 32:
-          # Wider-ResNet uses conv basic blocks except the last stage.
-          attention_type = None
-          recompute_grad = conv_use_recompute_grad or recompute_grad
           filters_list = [filters * 4,
                           filters * 4]
         else:
-          # Wider-ResNet uses an expanded bottleneck block in the last stage.
-          attention_type = None
-          recompute_grad = conv_use_recompute_grad or recompute_grad
           filters_list = [filters,
                           filters * 2,
                           filters * 4]
+        # Wider-ResNet uses conv basic blocks except the last stage.
+        attention_type = None
       else:
-        raise ValueError(backbone_type + ' is not supported.')
+        raise ValueError(f'{backbone_type} is not supported.')
 
       self._drop_path_keep_prob.append(current_drop_path_keep_prob)
       # Apply the residual block.

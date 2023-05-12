@@ -48,7 +48,7 @@ def get_drop_path_keep_prob(keep_prob_for_last_stage, schedule,
   elif schedule == 'linear':
     return 1.0 - (1.0 - keep_prob_for_last_stage) * current_stage / num_stages
   else:
-    raise ValueError('Unexpected schedule %s.' % schedule)
+    raise ValueError(f'Unexpected schedule {schedule}.')
 
 
 def generate_drop_path_random_mask(input_tensor, drop_path_keep_prob):

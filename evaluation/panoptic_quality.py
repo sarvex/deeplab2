@@ -242,10 +242,8 @@ class PanopticQuality(tf.keras.metrics.Metric):
     # Compute averages over classes.
     qualities = tf.stack(
         [pq, sq, rq, self.total_tp, self.total_fn, self.total_fp], axis=0)
-    summarized_qualities = tf.math.reduce_mean(
-        tf.boolean_mask(qualities, valid_classes, axis=1), axis=1)
-
-    return summarized_qualities
+    return tf.math.reduce_mean(tf.boolean_mask(qualities, valid_classes, axis=1),
+                               axis=1)
 
   def reset_states(self) -> None:
     """See base class."""

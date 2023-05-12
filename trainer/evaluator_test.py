@@ -67,12 +67,12 @@ def _create_panoptic_deeplab_loss(dataset_info):
       center_loss=center_loss_options,
       regression_loss=regression_loss_options)
 
-  loss_layer = loss_builder.DeepLabFamilyLoss(
+  return loss_builder.DeepLabFamilyLoss(
       loss_options,
       num_classes=dataset_info.num_classes,
       ignore_label=dataset_info.ignore_label,
-      thing_class_ids=dataset_info.class_has_instances_list)
-  return loss_layer
+      thing_class_ids=dataset_info.class_has_instances_list,
+  )
 
 
 def _create_max_deeplab_loss(dataset_info):
@@ -88,12 +88,12 @@ def _create_max_deeplab_loss(dataset_info):
       pq_style_loss=pq_style_loss_options,
       mask_id_cross_entropy_loss=mask_id_cross_entropy_loss_options,
       instance_discrimination_loss=instance_discrimination_loss_options)
-  loss_layer = loss_builder.DeepLabFamilyLoss(
+  return loss_builder.DeepLabFamilyLoss(
       loss_options,
       num_classes=dataset_info.num_classes,
       ignore_label=dataset_info.ignore_label,
-      thing_class_ids=dataset_info.class_has_instances_list)
-  return loss_layer
+      thing_class_ids=dataset_info.class_has_instances_list,
+  )
 
 
 class RealDataEvaluatorTest(tf.test.TestCase):
@@ -111,7 +111,7 @@ class RealDataEvaluatorTest(tf.test.TestCase):
     with tf.io.gfile.GFile(image_path, 'rb') as image_file:
       rgb_image = data_utils.read_image(image_file.read())
     self._rgb_image = tf.convert_to_tensor(np.array(rgb_image))
-    label_path = self._test_gt_data_dir + 'dummy_gt_for_vps.png'
+    label_path = f'{self._test_gt_data_dir}dummy_gt_for_vps.png'
     with tf.io.gfile.GFile(label_path, 'rb') as label_file:
       label = data_utils.read_image(label_file.read())
     self._label = tf.expand_dims(tf.convert_to_tensor(
@@ -173,9 +173,10 @@ class RealDataEvaluatorTest(tf.test.TestCase):
         dataset.CITYSCAPES_PANOPTIC_INFORMATION)
     global_step = tf.Variable(initial_value=0, dtype=tf.int64)
 
-    batched_sample = {}
-    for key, value in sample.items():
-      batched_sample[key] = tf.expand_dims(value, axis=0)
+    batched_sample = {
+        key: tf.expand_dims(value, axis=0)
+        for key, value in sample.items()
+    }
     real_data = [batched_sample]
 
     with tempfile.TemporaryDirectory() as model_dir:
@@ -193,12 +194,12 @@ class RealDataEvaluatorTest(tf.test.TestCase):
         result = ev.eval_end(state)
 
     expected_metric_keys = {
-        'losses/eval_' + common.TOTAL_LOSS,
-        'losses/eval_' + common.SEMANTIC_LOSS,
-        'losses/eval_' + common.PQ_STYLE_LOSS_CLASS_TERM,
-        'losses/eval_' + common.PQ_STYLE_LOSS_MASK_DICE_TERM,
-        'losses/eval_' + common.MASK_ID_CROSS_ENTROPY_LOSS,
-        'losses/eval_' + common.INSTANCE_DISCRIMINATION_LOSS,
+        f'losses/eval_{common.TOTAL_LOSS}',
+        f'losses/eval_{common.SEMANTIC_LOSS}',
+        f'losses/eval_{common.PQ_STYLE_LOSS_CLASS_TERM}',
+        f'losses/eval_{common.PQ_STYLE_LOSS_MASK_DICE_TERM}',
+        f'losses/eval_{common.MASK_ID_CROSS_ENTROPY_LOSS}',
+        f'losses/eval_{common.INSTANCE_DISCRIMINATION_LOSS}',
         'evaluation/iou/IoU',
         'evaluation/pq/PQ',
         'evaluation/pq/SQ',

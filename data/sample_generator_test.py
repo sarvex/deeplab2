@@ -89,7 +89,7 @@ class PanopticSampleGeneratorTest(tf.test.TestCase):
     with tf.io.gfile.GFile(image_path, 'rb') as image_file:
       rgb_image = data_utils.read_image(image_file.read())
     self._rgb_image = tf.convert_to_tensor(np.array(rgb_image))
-    label_path = self._test_gt_data_dir + 'dummy_gt_for_vps.png'
+    label_path = f'{self._test_gt_data_dir}dummy_gt_for_vps.png'
     with tf.io.gfile.GFile(label_path, 'rb') as label_file:
       label = data_utils.read_image(label_file.read())
     self._label = tf.expand_dims(tf.convert_to_tensor(
@@ -167,62 +167,70 @@ class PanopticSampleGeneratorTest(tf.test.TestCase):
 
     np.testing.assert_almost_equal(
         image.numpy(),
-        _get_groundtruth_image(
-            image,
-            self._test_target_data_dir + 'rgb_target.png'))
+        _get_groundtruth_image(image,
+                               f'{self._test_target_data_dir}rgb_target.png'),
+    )
     np.testing.assert_almost_equal(
         gt_sem.numpy(),
         _get_groundtruth_image(
-            gt_sem,
-            self._test_target_data_dir + 'semantic_target.png'))
+            gt_sem, f'{self._test_target_data_dir}semantic_target.png'),
+    )
     # Save gt as png. Pillow is currently unable to correctly save the image as
     # 32bit, but uses 16bit which overflows.
     _ = _get_groundtruth_image(
-        gt_pan, self._test_target_data_dir + 'panoptic_target.png')
+        gt_pan, f'{self._test_target_data_dir}panoptic_target.png')
     np.testing.assert_almost_equal(
         gt_pan.numpy(),
         _get_groundtruth_array(
-            gt_pan,
-            self._test_target_data_dir + 'panoptic_target.npy'))
+            gt_pan, f'{self._test_target_data_dir}panoptic_target.npy'),
+    )
     np.testing.assert_almost_equal(
         gt_thing_id_mask.numpy(),
         _get_groundtruth_array(
             gt_thing_id_mask,
-            self._test_target_data_dir + 'thing_id_mask_target.npy'))
+            f'{self._test_target_data_dir}thing_id_mask_target.npy',
+        ),
+    )
     np.testing.assert_almost_equal(
         gt_thing_id_class.numpy(),
         _get_groundtruth_array(
             gt_thing_id_class,
-            self._test_target_data_dir + 'thing_id_class_target.npy'))
+            f'{self._test_target_data_dir}thing_id_class_target.npy',
+        ),
+    )
     np.testing.assert_almost_equal(
         gt_center.numpy(),
-        _get_groundtruth_image(
-            gt_center,
-            self._test_target_data_dir + 'center_target.png'))
+        _get_groundtruth_image(gt_center,
+                               f'{self._test_target_data_dir}center_target.png'),
+    )
     np.testing.assert_almost_equal(
         sample[common.GT_INSTANCE_REGRESSION_KEY].numpy(),
         _get_groundtruth_array(
             sample[common.GT_INSTANCE_REGRESSION_KEY].numpy(),
-            self._test_target_data_dir + 'offset_target.npy'))
+            f'{self._test_target_data_dir}offset_target.npy',
+        ),
+    )
     np.testing.assert_array_equal(
         gt_is_crowd.numpy(),
         _get_groundtruth_array(gt_is_crowd.numpy(),
-                               self._test_target_data_dir + 'is_crowd.npy'))
+                               f'{self._test_target_data_dir}is_crowd.npy'),
+    )
     np.testing.assert_almost_equal(
         semantic_weights.numpy(),
         _get_groundtruth_image(
             semantic_weights,
-            self._test_target_data_dir + 'semantic_weights.png'))
+            f'{self._test_target_data_dir}semantic_weights.png'),
+    )
     np.testing.assert_almost_equal(
         center_weights.numpy(),
         _get_groundtruth_image(
-            center_weights,
-            self._test_target_data_dir + 'center_weights.png'))
+            center_weights, f'{self._test_target_data_dir}center_weights.png'),
+    )
     np.testing.assert_almost_equal(
         offset_weights.numpy(),
         _get_groundtruth_image(
-            offset_weights,
-            self._test_target_data_dir + 'offset_weights.png'))
+            offset_weights, f'{self._test_target_data_dir}offset_weights.png'),
+    )
 
   def test_input_generator_eval(self):
     tf.random.set_seed(0)
@@ -246,10 +254,10 @@ class PanopticSampleGeneratorTest(tf.test.TestCase):
     self.assertIn(common.GT_PANOPTIC_RAW, sample)
     self.assertIn(common.GT_IS_CROWD_RAW, sample)
 
-    gt_sem_raw = sample[common.GT_SEMANTIC_RAW]
     gt_pan_raw = sample[common.GT_PANOPTIC_RAW]
     gt_is_crowd_raw = sample[common.GT_IS_CROWD_RAW]
 
+    gt_sem_raw = sample[common.GT_SEMANTIC_RAW]
     self.assertListEqual(gt_sem_raw.shape.as_list(), [800, 800])
     self.assertListEqual(gt_pan_raw.shape.as_list(), [800, 800])
     self.assertListEqual(gt_is_crowd_raw.shape.as_list(), [800, 800])
@@ -257,17 +265,18 @@ class PanopticSampleGeneratorTest(tf.test.TestCase):
     np.testing.assert_almost_equal(
         gt_sem_raw.numpy(),
         _get_groundtruth_image(
-            gt_sem_raw,
-            self._test_target_data_dir + 'eval_semantic_target.png'))
+            gt_sem_raw, f'{self._test_target_data_dir}eval_semantic_target.png'),
+    )
     np.testing.assert_almost_equal(
         gt_pan_raw.numpy(),
         _get_groundtruth_array(
-            gt_pan_raw,
-            self._test_target_data_dir + 'eval_panoptic_target.npy'))
+            gt_pan_raw, f'{self._test_target_data_dir}eval_panoptic_target.npy'),
+    )
     np.testing.assert_almost_equal(
         gt_is_crowd_raw.numpy(),
-        _get_groundtruth_array(gt_is_crowd_raw, self._test_target_data_dir +
-                               'eval_is_crowd.npy'))
+        _get_groundtruth_array(gt_is_crowd_raw,
+                               f'{self._test_target_data_dir}eval_is_crowd.npy'),
+    )
 
 
 if __name__ == '__main__':

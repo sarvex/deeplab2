@@ -174,9 +174,9 @@ class BaseLossTest(tf.test.TestCase):
         tf.random.uniform(shape=[2, 33, num_classes]),
     ]
     expected_result_list = [False, False, True, True]
-    output_list = []
-    for gt, pred in zip(gt_list, pred_list):
-      output_list.append(loss.is_one_hot(gt, pred))
+    output_list = [
+        loss.is_one_hot(gt, pred) for gt, pred in zip(gt_list, pred_list)
+    ]
     np.testing.assert_equal(output_list, expected_result_list)
 
   def test_focal_ce_loss_integer_or_one_hot(self):

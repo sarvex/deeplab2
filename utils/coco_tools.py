@@ -189,13 +189,9 @@ def ExportSingleImageDetectionMasksToCoco(
                          detection_classes.shape[0], len(detection_masks),
                          detection_scores.shape[0]
                      ))
-  detections_list = []
-  for i in range(num_boxes):
-    if detection_classes[i] in category_id_set:
-      detections_list.append({
-          'image_id': image_id,
-          'category_id': int(detection_classes[i]),
-          'segmentation': mask.encode(np.asfortranarray(detection_masks[i])),
-          'score': float(detection_scores[i])
-      })
-  return detections_list
+  return [{
+      'image_id': image_id,
+      'category_id': int(detection_classes[i]),
+      'segmentation': mask.encode(np.asfortranarray(detection_masks[i])),
+      'score': float(detection_scores[i]),
+  } for i in range(num_boxes) if detection_classes[i] in category_id_set]

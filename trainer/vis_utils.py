@@ -210,28 +210,26 @@ def make_colorwheel():
 
   ncols = RY + YG + GC + CB + BM + MR
   colorwheel = np.zeros((ncols, 3))
-  col = 0
-
   # RY
   colorwheel[0:RY, 0] = 255
   colorwheel[0:RY, 1] = np.floor(255 * np.arange(0, RY) / RY)
-  col = col + RY
+  col = 0 + RY
   # YG
   colorwheel[col:col + YG, 0] = 255 - np.floor(255 * np.arange(0, YG) / YG)
   colorwheel[col:col + YG, 1] = 255
-  col = col + YG
+  col += YG
   # GC
   colorwheel[col:col + GC, 1] = 255
   colorwheel[col:col + GC, 2] = np.floor(255 * np.arange(0, GC) / GC)
-  col = col + GC
+  col += GC
   # CB
   colorwheel[col:col+CB, 1] = 255 - np.floor(255*np.arange(CB)/CB)
   colorwheel[col:col+CB, 2] = 255
-  col = col+CB
+  col += CB
   # BM
   colorwheel[col:col + BM, 2] = 255
   colorwheel[col:col + BM, 0] = np.floor(255 * np.arange(0, BM) / BM)
-  col = col + BM
+  col += BM
   # MR
   colorwheel[col:col+MR, 2] = 255 - np.floor(255*np.arange(MR)/MR)
   colorwheel[col:col+MR, 0] = 255
@@ -408,11 +406,10 @@ def label_to_color_image(label, colormap_name='cityscapes'):
       map maximum entry.
   """
   if label.ndim != 2:
-    raise ValueError('Expect 2-D input label. Got {}'.format(label.shape))
+    raise ValueError(f'Expect 2-D input label. Got {label.shape}')
 
   if np.max(label) >= 256:
-    raise ValueError(
-        'label value too large: {} >= 256.'.format(np.max(label)))
+    raise ValueError(f'label value too large: {np.max(label)} >= 256.')
 
   if colormap_name == 'cityscapes':
     colormap = create_cityscapes_label_colormap()
@@ -421,8 +418,7 @@ def label_to_color_image(label, colormap_name='cityscapes'):
   elif colormap_name == 'coco':
     colormap = create_coco_label_colormap()
   else:
-    raise ValueError('Could not find a colormap for dataset %s.' %
-                     colormap_name)
+    raise ValueError(f'Could not find a colormap for dataset {colormap_name}.')
   return colormap[label]
 
 
@@ -471,14 +467,14 @@ def save_parsing_result(parsing_result,
     If id_to_colormap is passed, the updated id_to_colormap will be returned.
   """
   if parsing_result.ndim != 2:
-    raise ValueError('Expect 2-D parsing result. Got {}'.format(
-        parsing_result.shape))
+    raise ValueError(f'Expect 2-D parsing result. Got {parsing_result.shape}')
   semantic_result = parsing_result // label_divisor
   instance_result = parsing_result % label_divisor
   colormap_max_value = 256
   if np.max(semantic_result) >= colormap_max_value:
-    raise ValueError('Predicted semantic value too large: {} >= {}.'.format(
-        np.max(semantic_result), colormap_max_value))
+    raise ValueError(
+        f'Predicted semantic value too large: {np.max(semantic_result)} >= {colormap_max_value}.'
+    )
   height, width = parsing_result.shape
   colored_output = np.zeros((height, width, 3), dtype=np.uint8)
   if colormap_name == 'cityscapes':
@@ -488,12 +484,11 @@ def save_parsing_result(parsing_result,
   elif colormap_name == 'coco':
     colormap = create_coco_label_colormap()
   else:
-    raise ValueError('Could not find a colormap for dataset %s.' %
-                     colormap_name)
+    raise ValueError(f'Could not find a colormap for dataset {colormap_name}.')
   # Keep track of used colors.
   used_colors = set()
   if id_to_colormap is not None:
-    used_colors = set([tuple(val) for val in id_to_colormap.values()])
+    used_colors = {tuple(val) for val in id_to_colormap.values()}
     np_state = None
   else:
     # Use random seed 0 in order to reproduce the same visualization.
@@ -509,10 +504,9 @@ def save_parsing_result(parsing_result,
       for instance_value in unique_instance_values:
         instance_mask = np.logical_and(semantic_mask,
                                        instance_result == instance_value)
-        if id_to_colormap is not None:
-          if instance_value in id_to_colormap:
-            colored_output[instance_mask] = id_to_colormap[instance_value]
-            continue
+        if id_to_colormap is not None and instance_value in id_to_colormap:
+          colored_output[instance_mask] = id_to_colormap[instance_value]
+          continue
         random_color = perturb_color(
             colormap[semantic_value],
             _COLOR_PERTURBATION,
@@ -527,7 +521,7 @@ def save_parsing_result(parsing_result,
       used_colors.add(tuple(colormap[semantic_value]))
 
   pil_image = PIL.Image.fromarray(colored_output.astype(dtype=np.uint8))
-  with tf.io.gfile.GFile('{}/{}.png'.format(save_dir, filename), mode='w') as f:
+  with tf.io.gfile.GFile(f'{save_dir}/{filename}.png', mode='w') as f:
     pil_image.save(f, 'PNG')
   if id_to_colormap is not None:
     return id_to_colormap
@@ -609,5 +603,5 @@ def save_annotation(label,
       colored_label = 255. * colored_label
 
   pil_image = PIL.Image.fromarray(colored_label.astype(dtype=np.uint8))
-  with tf.io.gfile.GFile('%s/%s.png' % (save_dir, filename), mode='w') as f:
+  with tf.io.gfile.GFile(f'{save_dir}/{filename}.png', mode='w') as f:
     pil_image.save(f, 'PNG')

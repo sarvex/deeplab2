@@ -135,24 +135,19 @@ def _block_spec_decoder(specs: Mapping[Any, Any],
     A list of block spec in dictionary that defines structure of the layers.
   """
 
-  spec_name = specs['spec_name']
   block_spec_schema = specs['block_spec_schema']
   block_specs = specs['block_specs']
 
   if not block_specs:
-    raise ValueError(
-        'The block spec cannot be empty for {} !'.format(spec_name))
+    spec_name = specs['spec_name']
+    raise ValueError(f'The block spec cannot be empty for {spec_name} !')
 
   if len(block_specs[0]) != len(block_spec_schema):
-    raise ValueError('The block spec values {} do not match with '
-                     'the schema {}'.format(block_specs[0], block_spec_schema))
+    raise ValueError(
+        f'The block spec values {block_specs[0]} do not match with the schema {block_spec_schema}'
+    )
 
-  decoded_specs = []
-
-  for spec in block_specs:
-    spec_dict = dict(zip(block_spec_schema, spec))
-    decoded_specs.append(spec_dict)
-
+  decoded_specs = [dict(zip(block_spec_schema, spec)) for spec in block_specs]
   for ds in decoded_specs:
     ds['filters'] = utils.make_divisible(
         value=ds['filters'] * width_multiplier,
@@ -210,14 +205,12 @@ class MobileNet(tf.keras.Model):
       ValueError: Unknown block type i for layer j.
     """
     if model_id not in SUPPORTED_SPECS_MAP:
-      raise ValueError('The MobileNet version {} '
-                       'is not supported'.format(model_id))
+      raise ValueError(f'The MobileNet version {model_id} is not supported')
 
     if width_multiplier <= 0:
       raise ValueError('width_multiplier is not greater than zero.')
 
-    if (output_stride is not None and
-        (output_stride <= 1 or (output_stride > 1 and output_stride % 4))):
+    if output_stride is not None and (output_stride <= 1 or output_stride % 4):
       raise ValueError('Output stride must be None or a multiple of 4.')
 
     super().__init__(name=name)
@@ -261,7 +254,7 @@ class MobileNet(tf.keras.Model):
       if endpoint_level > 5 and not self._classification_mode:
         break
 
-      block_name = '{}_{}'.format(block_def['block_fn'], i + 1)
+      block_name = f"{block_def['block_fn']}_{i + 1}"
 
       if (self._output_stride is not None and
           current_stride == self._output_stride):
@@ -327,8 +320,7 @@ class MobileNet(tf.keras.Model):
                 ))
 
       else:
-        raise ValueError('Unknown block type {} for layer {}'.format(
-            block_def['block_fn'], i))
+        raise ValueError(f"Unknown block type {block_def['block_fn']} for layer {i}")
 
       # Register input_filters for the next level
       in_filters = block_def['filters']
@@ -336,7 +328,7 @@ class MobileNet(tf.keras.Model):
       if block_def['is_endpoint']:
         # Name the endpoint to be 'res{1...5}' to align with ResNet. This
         # simplifies segmentation head implementation.
-        self._endpoint_names.append('res' + str(endpoint_level))
+        self._endpoint_names.append(f'res{str(endpoint_level)}')
         endpoint_level += 1
       else:
         self._endpoint_names.append(None)
@@ -372,13 +364,14 @@ def MobileNetV3Small(
   Returns:
     The MobileNetV3Small model as an instance of tf.keras.Model.
   """
-  model = MobileNet(model_id='MobileNetV3Small',
-                    width_multiplier=width_multiplier,
-                    output_stride=output_stride,
-                    bn_layer=bn_layer,
-                    conv_kernel_weight_decay=conv_kernel_weight_decay,
-                    name=name)
-  return model
+  return MobileNet(
+      model_id='MobileNetV3Small',
+      width_multiplier=width_multiplier,
+      output_stride=output_stride,
+      bn_layer=bn_layer,
+      conv_kernel_weight_decay=conv_kernel_weight_decay,
+      name=name,
+  )
 
 
 def MobileNetV3Large(
@@ -401,10 +394,11 @@ def MobileNetV3Large(
   Returns:
     The MobileNetV3Large model as an instance of tf.keras.Model.
   """
-  model = MobileNet(model_id='MobileNetV3Large',
-                    width_multiplier=width_multiplier,
-                    output_stride=output_stride,
-                    bn_layer=bn_layer,
-                    conv_kernel_weight_decay=conv_kernel_weight_decay,
-                    name=name)
-  return model
+  return MobileNet(
+      model_id='MobileNetV3Large',
+      width_multiplier=width_multiplier,
+      output_stride=output_stride,
+      bn_layer=bn_layer,
+      conv_kernel_weight_decay=conv_kernel_weight_decay,
+      name=name,
+  )

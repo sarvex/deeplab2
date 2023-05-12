@@ -61,19 +61,17 @@ def build_deeplab_model(deeplab_model: tf.keras.Model,
                         crop_size: Sequence[int],
                         batch_size: Optional[int] = None):
   """Builds DeepLab model with input crop size."""
-  if isinstance(deeplab_model, motion_deeplab.MotionDeepLab) or isinstance(
-      deeplab_model, vip_deeplab.ViPDeepLab):
+  if isinstance(deeplab_model,
+                (motion_deeplab.MotionDeepLab, vip_deeplab.ViPDeepLab)):
     # Motion-DeepLab and ViP-DeepLab use the input differently despite that
     # the input_shape is the same: Motion-DeepLab uses two frames as one input,
     # while ViP-DeepLab splits the two frames first and passes them individually
     # to the backbone encoder.
     input_shape = list(crop_size) + [_TWO_FRAME_MOTION_DEEPLAB_INPUT_CHANNELS]
-    deeplab_model(
-        tf.keras.Input(input_shape, batch_size=batch_size), training=False)
   else:
     input_shape = list(crop_size) + [_SINGLE_FRAME_INPUT_CHANNELS]
-    deeplab_model(
-        tf.keras.Input(input_shape, batch_size=batch_size), training=False)
+  deeplab_model(
+      tf.keras.Input(input_shape, batch_size=batch_size), training=False)
   return input_shape
 
 
@@ -136,7 +134,7 @@ def run_experiment(mode: Text, config: config_pb2.ExperimentOptions,
                                           global_step, model_dir)
 
   checkpoint_dict = dict(global_step=global_step)
-  checkpoint_dict.update(deeplab_model.checkpoint_items)
+  checkpoint_dict |= deeplab_model.checkpoint_items
   if trainer is not None:
     checkpoint_dict['optimizer'] = trainer.optimizer
     if trainer.backbone_optimizer is not None:
@@ -203,4 +201,4 @@ def run_experiment(mode: Text, config: config_pb2.ExperimentOptions,
       controller.evaluate_continuously(
           steps=config.evaluator_options.eval_steps, timeout=timeout)
     else:
-      raise ValueError('Mode %s is not a valid mode.' % mode)
+      raise ValueError(f'Mode {mode} is not a valid mode.')

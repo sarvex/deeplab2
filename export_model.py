@@ -129,7 +129,7 @@ class DeepLabModule(tf.Module):
       (resized_image, processed_image, _, _, _) = self._preprocess_fn(
           image=input_tensor)
 
-    resized_size = tf.shape(resized_image)[0:2]
+    resized_size = tf.shape(resized_image)[:2]
     # Making input tensor to 4D to fit model input requirements.
     outputs = self._model(tf.expand_dims(processed_image, 0), training=False)
     # We only undo-preprocess for those defined in tuples in model/utils.py.

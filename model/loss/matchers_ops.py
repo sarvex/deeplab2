@@ -448,8 +448,7 @@ def get_shape_list(tensor, expected_rank=None):
 
   shape = tensor.shape.as_list()
   dynamic = tf.shape(tensor)
-  output = [dim if dim else dynamic[ind] for ind, dim in enumerate(shape)]
-  return output
+  return [dim if dim else dynamic[ind] for ind, dim in enumerate(shape)]
 
 
 def hungarian_matching(weights):

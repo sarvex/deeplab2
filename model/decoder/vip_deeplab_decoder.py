@@ -208,7 +208,7 @@ class ViPDeepLabDecoder(layers.Layer):
           common.CKPT_INSTANCE_REGRESSION_HEAD_LAST_LAYER:
               self._instance_regression_head.final_conv,
       }
-      items.update(instance_items)
+      items |= instance_items
     if self._next_instance_decoder is not None:
       next_instance_items = {
           common.CKPT_NEXT_INSTANCE_DECODER:
@@ -218,7 +218,7 @@ class ViPDeepLabDecoder(layers.Layer):
           common.CKPT_NEXT_INSTANCE_REGRESSION_HEAD_LAST_LAYER:
               self._next_instance_regression_head.final_conv,
       }
-      items.update(next_instance_items)
+      items |= next_instance_items
     return items
 
   def call(self, features, next_features, training=False):

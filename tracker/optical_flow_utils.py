@@ -23,8 +23,7 @@ def warp_flow(img: np.ndarray, flow_tensor: np.ndarray) -> np.ndarray:
   h, w = flow.shape[:2]
   flow[..., 0] += np.arange(w)
   flow[..., 1] += np.arange(h)[:, np.newaxis]
-  res = cv.remap(img, flow, None, cv.INTER_LINEAR)
-  return res
+  return cv.remap(img, flow, None, cv.INTER_LINEAR)
 
 
 def remove_occlusions(warped_binary_img: np.ndarray,

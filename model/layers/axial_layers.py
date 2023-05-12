@@ -166,13 +166,11 @@ class AxialAttention(tf.keras.layers.Layer):
         triggered if query_shape is less than input_shape.
     """
 
-    # Apply global attention if query_shape is larger than input_shape[1].
-    if self._query_shape >= input_shape[1]:
-      self._query_shape = input_shape[1]
-      self._memory_flange = 0
-    else:
+    if self._query_shape < input_shape[1]:
       raise NotImplementedError('Local axial attention has not been '
                                 'implemented yet.')
+    self._query_shape = input_shape[1]
+    self._memory_flange = 0
     self._memory_shape = self._query_shape + 2 * self._memory_flange
 
     # Compute query key value with one convolution and an optional batch norm.

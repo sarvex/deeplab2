@@ -404,7 +404,7 @@ class PanopticDeepLab(layers.Layer):
           common.CKPT_INSTANCE_REGRESSION_HEAD_LAST_LAYER:
               self._instance_regression_head.final_conv,
       }
-      items.update(instance_items)
+      items |= instance_items
     return items
 
   def call(self, features, training=False):

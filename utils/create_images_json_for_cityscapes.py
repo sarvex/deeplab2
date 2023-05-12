@@ -77,7 +77,7 @@ def _create_images_json(image_dir, output_json_path, only_basename=False,
   for city_dir in tf.io.gfile.listdir(image_dir):
     if keep_cities and city_dir not in keep_cities:
       continue
-    image_id_re = r'%s_[0-9]+_[0-9]+' % city_dir
+    image_id_re = f'{city_dir}_[0-9]+_[0-9]+'
     image_id_re = re.compile(image_id_re)
     for image_basename in tf.io.gfile.listdir(
         os.path.join(image_dir, city_dir)):

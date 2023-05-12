@@ -81,16 +81,15 @@ class DSTQuality(stq.STQuality):
     """
     super().__init__(num_classes, things_list, ignore_label,
                      max_instances_per_category, offset, name)
-    if not (isinstance(depth_threshold, tuple) or
-            isinstance(depth_threshold, list)):
+    if not (isinstance(depth_threshold, (tuple, list))):
       raise TypeError('The type of depth_threshold must be tuple or list.')
     if not depth_threshold:
       raise ValueError('depth_threshold must be non-empty.')
     self._depth_threshold = tuple(depth_threshold)
     self._depth_total_counts = collections.OrderedDict()
     self._depth_inlier_counts = []
-    for _ in range(len(self._depth_threshold)):
-      self._depth_inlier_counts.append(collections.OrderedDict())
+    self._depth_inlier_counts.extend(collections.OrderedDict()
+                                     for _ in range(len(self._depth_threshold)))
 
   def update_state(self,
                    y_true: tf.Tensor,
@@ -177,27 +176,24 @@ class DSTQuality(stq.STQuality):
         dq_at_threshold[threshold] = inlier_count / total_count
     # Compute DQ as the geometric mean of DQ's at different thresholds.
     dq = 1
-    for _, threshold in enumerate(self._depth_threshold):
+    for threshold in self._depth_threshold:
       dq *= dq_at_threshold[threshold]
     dq = dq ** (1 / len(self._depth_threshold))
-    dq_results = {}
-    dq_results['DQ'] = dq
-    for _, threshold in enumerate(self._depth_threshold):
-      dq_results['DQ@{}'.format(threshold)] = dq_at_threshold[threshold]
-      dq_results['DQ_per_seq@{}'.format(
-          threshold)] = dq_per_seq_at_threshold[threshold]
+    dq_results = {'DQ': dq}
+    for threshold in self._depth_threshold:
+      dq_results[f'DQ@{threshold}'] = dq_at_threshold[threshold]
+      dq_results[f'DQ_per_seq@{threshold}'] = dq_per_seq_at_threshold[threshold]
     # Combine STQ and DQ to get DSTQ.
-    dstq_results = {}
-    dstq_results['DSTQ'] = (stq_results['STQ'] ** 2 * dq) ** (1/3)
-    for _, threshold in enumerate(self._depth_threshold):
-      dstq_results['DSTQ@{}'.format(threshold)] = (
-          stq_results['STQ'] ** 2 * dq_at_threshold[threshold]) ** (1/3)
-      dstq_results['DSTQ_per_seq@{}'.format(threshold)] = [
+    dstq_results = {'DSTQ': (stq_results['STQ'] ** 2 * dq)**(1/3)}
+    for threshold in self._depth_threshold:
+      dstq_results[f'DSTQ@{threshold}'] = (stq_results['STQ']**2 *
+                                           dq_at_threshold[threshold])**(1 / 3)
+      dstq_results[f'DSTQ_per_seq@{threshold}'] = [
           (stq_result**2 * dq_result)**(1 / 3) for stq_result, dq_result in zip(
               stq_results['STQ_per_seq'], dq_per_seq_at_threshold[threshold])
       ]
     # Merge all the results.
-    dstq_results.update(stq_results)
+    dstq_results |= stq_results
     dstq_results.update(dq_results)
     return dstq_results
 
@@ -206,5 +202,5 @@ class DSTQuality(stq.STQuality):
     super().reset_states()
     self._depth_total_counts = collections.OrderedDict()
     self._depth_inlier_counts = []
-    for _ in range(len(self._depth_threshold)):
-      self._depth_inlier_counts.append(collections.OrderedDict())
+    self._depth_inlier_counts.extend(collections.OrderedDict()
+                                     for _ in range(len(self._depth_threshold)))

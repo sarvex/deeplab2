@@ -157,10 +157,7 @@ class InvertedBottleneckBlock(tf.keras.layers.Layer):
 
     # Squeeze and excitation.
     if self._se_ratio is not None and self._se_ratio > 0:
-      if self._expand_se_in_filters:
-        in_filters = expand_filters
-      else:
-        in_filters = self._in_filters
+      in_filters = expand_filters if self._expand_se_in_filters else self._in_filters
       self._squeeze_excitation = squeeze_and_excite.SqueezeAndExcite(
           in_filters=in_filters,
           out_filters=expand_filters,
@@ -170,7 +167,8 @@ class InvertedBottleneckBlock(tf.keras.layers.Layer):
           kernel_regularizer=tf.keras.regularizers.l2(conv_kernel_weight_decay),
           activation=self._se_inner_activation,
           gating_activation=self._se_gating_activation,
-          name=name + '_se')
+          name=f'{name}_se',
+      )
     else:
       logging.info(
           'Squeeze and Excitation is skipped due to undefined se_ratio')

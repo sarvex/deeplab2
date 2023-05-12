@@ -45,9 +45,7 @@ class Deeplabv3Test(tf.test.TestCase):
         decoder_channels=48,
         atrous_rates=[6, 12, 18],
         num_classes=80)
-    input_dict = dict()
-    input_dict['not_the_same_key'] = tf.random.uniform(shape=(2, 65, 65, 32))
-
+    input_dict = {'not_the_same_key': tf.random.uniform(shape=(2, 65, 65, 32))}
     with self.assertRaises(KeyError):
       _ = deeplabv3_decoder(input_dict)
 
@@ -90,9 +88,7 @@ class Deeplabv3Test(tf.test.TestCase):
         num_classes=80,
         feature_key='feature_key')
     input_tensor = tf.random.uniform(shape=(2, 65, 65, 32))
-    input_dict = dict()
-    input_dict['feature_key'] = input_tensor
-
+    input_dict = {'feature_key': input_tensor}
     reference_logits_tensor = deeplabv3_decoder(input_tensor, training=False)
     logits_tensor_to_compare = deeplabv3_decoder(input_dict, training=False)
 

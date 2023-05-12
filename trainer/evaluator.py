@@ -258,11 +258,13 @@ class Evaluator(orbit.StandardEvaluator):
     if not self._decode_groundtruth_label:
       return {}
 
-    eval_logs = {}
-    for loss_metric in self._eval_loss_metric_dict.values():
-      eval_logs['losses/' + loss_metric.name] = loss_metric.result()
-    eval_logs['evaluation/iou/' + self._eval_iou_metric.name] = (
-        self._eval_iou_metric.result())
+    eval_logs = {
+        f'losses/{loss_metric.name}': loss_metric.result()
+        for loss_metric in self._eval_loss_metric_dict.values()
+    }
+    eval_logs[
+        f'evaluation/iou/{self._eval_iou_metric.name}'] = self._eval_iou_metric.result(
+        )
     if common.TASK_PANOPTIC_SEGMENTATION in self._supported_tasks:
       pq_results = self._eval_pq_metric.result()
       eval_logs['evaluation/pq/PQ'] = pq_results[0]

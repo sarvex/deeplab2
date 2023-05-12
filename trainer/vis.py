@@ -73,8 +73,8 @@ def _convert_train_id_to_eval_id(
     train_id_to_eval_id = _COCO_TRAIN_ID_TO_EVAL_ID
   else:
     raise ValueError(
-        'Unsupported dataset %s for converting semantic class IDs.' %
-        dataset_name)
+        f'Unsupported dataset {dataset_name} for converting semantic class IDs.'
+    )
   length = np.maximum(256, len(train_id_to_eval_id))
   to_eval_id_map = np.zeros((length), dtype=prediction.dtype)
   dataset_ids = np.asarray(
@@ -217,12 +217,10 @@ def store_raw_predictions(predictions: Dict[str, Any],
     elif raw_panoptic_format == 'two_channel_numpy_array':
       panoptic_outputs[:, :, 0] = predicted_semantic_labels
       panoptic_outputs[:, :, 1] = predicted_instance_labels
-      with tf.io.gfile.GFile(
-          os.path.join(output_folder, image_filename + '.npy'), 'w') as f:
+      with tf.io.gfile.GFile(os.path.join(output_folder, f'{image_filename}.npy'), 'w') as f:
         np.save(f, panoptic_outputs)
     else:
-      raise ValueError(
-          'Unknown raw_panoptic_format %s.' % raw_panoptic_format)
+      raise ValueError(f'Unknown raw_panoptic_format {raw_panoptic_format}.')
 
 
 def store_predictions(predictions: Dict[str, Any], inputs: Dict[str, Any],

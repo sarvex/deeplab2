@@ -58,8 +58,8 @@ def create_encoder(backbone_options: config_pb2.ModelOptions.BackboneOptions,
         backbone_options,
         bn_layer=bn_layer,
         conv_kernel_weight_decay=conv_kernel_weight_decay)
-  raise ValueError('The specified encoder %s is not a valid encoder.' %
-                   backbone_options.name)
+  raise ValueError(
+      f'The specified encoder {backbone_options.name} is not a valid encoder.')
 
 
 def create_mobilenet_encoder(
@@ -82,8 +82,9 @@ def create_mobilenet_encoder(
   elif backbone_options.name.lower() == 'mobilenet_v3_small':
     backbone = mobilenet.MobileNetV3Small
   else:
-    raise ValueError('The specified encoder %s is not a valid encoder.' %
-                     backbone_options.name)
+    raise ValueError(
+        f'The specified encoder {backbone_options.name} is not a valid encoder.'
+    )
   assert backbone_options.use_squeeze_and_excite
   assert backbone_options.drop_path_keep_prob == 1
   assert backbone_options.use_sac_beyond_stride == -1
@@ -170,5 +171,6 @@ def create_decoder(model_options: config_pb2.ModelOptions,
         model_options.max_deeplab,
         ignore_label=ignore_label,
         bn_layer=bn_layer)
-  raise ValueError('The specified meta architecture %s is not implemented.' %
-                   meta_architecture)
+  raise ValueError(
+      f'The specified meta architecture {meta_architecture} is not implemented.'
+  )

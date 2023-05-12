@@ -69,8 +69,7 @@ class BuildStepDataTest(tf.test.TestCase):
     with tf.io.gfile.GFile(
         os.path.join(panoptic_path, '%06d.png' % image_id), 'wb') as f:
       Image.fromarray(encoded_panoptic_map).save(f, format='PNG')
-    decoded_panoptic_map = semantic * 1000 + instance
-    return decoded_panoptic_map
+    return semantic * 1000 + instance
 
   def test_build_step_dataset_correct(self):
     split = 'train'

@@ -112,10 +112,9 @@ class DeepLabV3(layers.Layer):
 
   @property
   def checkpoint_items(self):
-    items = {
+    return {
         common.CKPT_DEEPLABV3_ASPP: self._aspp,
         common.CKPT_DEEPLABV3_CLASSIFIER_CONV_BN_ACT:
-            self._classifier_conv_bn_act,
+        self._classifier_conv_bn_act,
         common.CKPT_SEMANTIC_LAST_LAYER: self._final_conv,
     }
-    return items

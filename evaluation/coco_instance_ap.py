@@ -61,13 +61,11 @@ def _unwrap_annotation(ann: Mapping[str, Any]) -> Mapping[str, Any]:
     The same annotation information, but with wrappers reduced to built-in
     types.
   """
-  unwrapped_ann = {}
-  for k in ann:
-    if k in _ANNOTATION_CONVERSION:
-      unwrapped_ann[k] = _ANNOTATION_CONVERSION[k](ann[k])
-    else:
-      unwrapped_ann[k] = ann[k]
-  return unwrapped_ann
+  return {
+      k: _ANNOTATION_CONVERSION[k](ann[k])
+      if k in _ANNOTATION_CONVERSION else ann[k]
+      for k in ann
+  }
 
 
 class InstanceAveragePrecision(tf.keras.metrics.Metric):

@@ -51,8 +51,14 @@ class GlobalContext(tf.keras.layers.Layer):
     input_channel = self._get_input_channel(input_shape)
     self.global_average_pooling = tf.keras.layers.GlobalAveragePooling2D()
     self.convolution = tf.keras.layers.Conv2D(
-        input_channel, 1, strides=1, padding='same', name=self.name + '_conv',
-        kernel_initializer='zeros', bias_initializer='zeros')
+        input_channel,
+        1,
+        strides=1,
+        padding='same',
+        name=f'{self.name}_conv',
+        kernel_initializer='zeros',
+        bias_initializer='zeros',
+    )
 
   def call(self, inputs, *args, **kwargs):
     outputs = self.global_average_pooling(inputs)
@@ -102,7 +108,8 @@ class SwitchableAtrousConvolution(tf.keras.layers.Conv2D):
         padding=tf_padding,
         dilations=large_dilation_rate,
         data_format=self._tf_data_format,
-        name=self.__class__.__name__ + '_large')
+        name=f'{self.__class__.__name__}_large',
+    )
 
   def call(self, inputs):
     # Reference: tf.keras.layers.convolutional.Conv.
@@ -126,9 +133,7 @@ class SwitchableAtrousConvolution(tf.keras.layers.Conv2D):
       out_shape = self.compute_output_shape(input_shape)
       outputs.set_shape(out_shape)
 
-    if self.activation is not None:
-      return self.activation(outputs)
-    return outputs
+    return self.activation(outputs) if self.activation is not None else outputs
 
   def squeeze_batch_dims(self, inp, op, inner_rank):
     # Reference: tf.keras.utils.conv_utils.squeeze_batch_dims.
@@ -232,7 +237,7 @@ class Conv2DSame(tf.keras.layers.Layer):
 
     convolution_op = tf.keras.layers.Conv2D
     convolution_padding = 'same'
-    if strides == 1 or strides == (1, 1):
+    if strides in [1, (1, 1)]:
       if use_switchable_atrous_conv:
         convolution_op = SwitchableAtrousConvolution
     else:
@@ -283,7 +288,7 @@ class Conv2DSame(tf.keras.layers.Layer):
     if self._use_global_context_in_sac:
       x = self._pre_global_context(x)
 
-    if not (self._strides == 1 or self._strides == (1, 1)):
+    if self._strides not in [1, (1, 1)]:
       x = self._zeropad(x)
     x = self._conv(x)
 
@@ -342,7 +347,7 @@ class DepthwiseConv2DSame(tf.keras.layers.Layer):
       raise ValueError(
           'DepthwiseConv2DSame is using convlution bias with batch_norm.')
 
-    if strides == 1 or strides == (1, 1):
+    if strides in [1, (1, 1)]:
       convolution_padding = 'same'
     else:
       padding = _compute_padding_size(kernel_size, atrous_rate)
@@ -379,7 +384,7 @@ class DepthwiseConv2DSame(tf.keras.layers.Layer):
       The output tensor.
     """
     x = input_tensor
-    if not (self._strides == 1 or self._strides == (1, 1)):
+    if self._strides not in [1, (1, 1)]:
       x = self._zeropad(x)
     x = self._depthwise_conv(x)
     if self._use_bn:
@@ -520,12 +525,12 @@ class StackedConv2DSame(tf.keras.layers.Layer):
         nor 'depthwise_separable_conv'.
     """
     super(StackedConv2DSame, self).__init__(name=name)
-    if conv_type == 'standard_conv':
-      convolution_op = Conv2DSame
-    elif conv_type == 'depthwise_separable_conv':
+    if conv_type == 'depthwise_separable_conv':
       convolution_op = SeparableConv2DSame
+    elif conv_type == 'standard_conv':
+      convolution_op = Conv2DSame
     else:
-      raise ValueError('Convolution %s not supported.' % conv_type)
+      raise ValueError(f'Convolution {conv_type} not supported.')
 
     for index in range(num_layers):
       current_name = utils.get_conv_bn_act_current_name(index, use_bn,

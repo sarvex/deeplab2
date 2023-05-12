@@ -91,7 +91,7 @@ def _get_images(coco_root: str, dataset_split: str) -> Sequence[str]:
   Returns:
     A list of sorted file names.
   """
-  pattern = '*.%s' % _DATA_FORMAT_MAP['image']
+  pattern = f"*.{_DATA_FORMAT_MAP['image']}"
   search_files = os.path.join(
       coco_root, _FOLDERS_MAP[dataset_split]['image'], pattern)
   filenames = tf.io.gfile.glob(search_files)
@@ -100,7 +100,7 @@ def _get_images(coco_root: str, dataset_split: str) -> Sequence[str]:
 
 def _get_panoptic_annotation(coco_root: str, dataset_split: str,
                              annotation_file_name: str) -> str:
-  panoptic_folder = 'panoptic_%s2017' % dataset_split
+  panoptic_folder = f'panoptic_{dataset_split}2017'
   return os.path.join(coco_root, _FOLDERS_MAP[dataset_split]['label'],
                       panoptic_folder, annotation_file_name)
 
@@ -121,8 +121,10 @@ def _read_segments(coco_root: str, dataset_split: str):
     ValueError: If found duplicated image id in annotations.
   """
   json_filename = os.path.join(
-      coco_root, _FOLDERS_MAP[dataset_split]['label'],
-      'panoptic_%s2017.json' % dataset_split)
+      coco_root,
+      _FOLDERS_MAP[dataset_split]['label'],
+      f'panoptic_{dataset_split}2017.json',
+  )
   with tf.io.gfile.GFile(json_filename) as f:
     panoptic_dataset = json.load(f)
 
@@ -130,7 +132,7 @@ def _read_segments(coco_root: str, dataset_split: str):
   for annotation in panoptic_dataset['annotations']:
     image_id = annotation['image_id']
     if image_id in segments_dict:
-      raise ValueError('Image ID %s already exists' % image_id)
+      raise ValueError(f'Image ID {image_id} already exists')
     annotation_file_name = annotation['file_name']
     segments = annotation['segments_info']
 
@@ -163,8 +165,8 @@ def _generate_panoptic_label(panoptic_annotation_file: str, segments:
     panoptic_label = data_utils.read_image(f.read())
 
   if panoptic_label.mode != 'RGB':
-    raise ValueError('Expect RGB image for panoptic label, gets %s' %
-                     panoptic_label.mode)
+    raise ValueError(
+        f'Expect RGB image for panoptic label, gets {panoptic_label.mode}')
 
   panoptic_label = np.array(panoptic_label, dtype=np.int32)
   # COCO panoptic map is created by:

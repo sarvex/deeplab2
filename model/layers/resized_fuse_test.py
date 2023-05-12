@@ -29,9 +29,9 @@ class ResizedFuseTest(tf.test.TestCase):
     larger_height2, larger_width2 = 22, 22  # Stride 2 conv.
     larger_height3, larger_width3 = 23, 23  # Conv and resize.
 
-    feature_list = []
-    feature_list.append(tf.zeros([batch, smaller_height, smaller_width,
-                                  smaller_channels]))
+    feature_list = [
+        tf.zeros([batch, smaller_height, smaller_width, smaller_channels])
+    ]
     feature_list.append(tf.zeros([batch, smaller_height, smaller_width,
                                   channels]))
     feature_list.append(tf.zeros([batch, height, width, smaller_channels]))

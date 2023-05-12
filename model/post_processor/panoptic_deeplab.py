@@ -398,10 +398,10 @@ class SemanticOnlyPostProcessor(tf.keras.layers.Layer):
       The post-processed dict of tf.Tensor, containing the following:
        - common.PRED_SEMANTIC_KEY,
     """
-    processed_dict = {}
-    processed_dict[common.PRED_SEMANTIC_KEY] = _get_semantic_predictions(
-        result_dict[common.PRED_SEMANTIC_PROBS_KEY])
-    return processed_dict
+    return {
+        common.PRED_SEMANTIC_KEY:
+        _get_semantic_predictions(result_dict[common.PRED_SEMANTIC_PROBS_KEY])
+    }
 
 
 class PostProcessor(tf.keras.layers.Layer):

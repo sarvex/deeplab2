@@ -260,7 +260,7 @@ class ViPDeepLab(tf.keras.Model):
   @property
   def checkpoint_items(self) -> Dict[Text, Any]:
     items = dict(encoder=self._encoder)
-    items.update(self._decoder.checkpoint_items)
+    items |= self._decoder.checkpoint_items
     return items
 
   def _resize_predictions(self, result_dict, target_h, target_w, reverse=False):

@@ -835,10 +835,7 @@ def get_id_mapping() -> Mapping[int, int]:
   Returns:
     A dictionary mapping original category id to contiguous category ids.
   """
-  id_mapping = {}
-  for i in range(len(_COCO_META)):
-    id_mapping[_COCO_META[i]['id']] = i + 1
-  return id_mapping
+  return {_COCO_META[i]['id']: i + 1 for i in range(len(_COCO_META))}
 
 
 def get_id_mapping_inverse() -> Sequence[int]:
@@ -853,8 +850,7 @@ def get_id_mapping_inverse() -> Sequence[int]:
   Returns:
     A dictionary mapping contiguous category ids to original COCO category id.
   """
-  id_mapping_inverse = (0,) + tuple([ori_cat['id'] for ori_cat in _COCO_META])
-  return id_mapping_inverse
+  return (0,) + tuple(ori_cat['id'] for ori_cat in _COCO_META)
 
 
 def get_coco_reduced_meta() -> Sequence[Any]:

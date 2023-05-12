@@ -65,7 +65,7 @@ def get_image_dims(image_data, check_is_rgb=False):
   image = read_image(image_data)
 
   if check_is_rgb and image.mode != 'RGB':
-    raise ValueError('Expects RGB image data, gets mode: %s' % image.mode)
+    raise ValueError(f'Expects RGB image data, gets mode: {image.mode}')
 
   width, height = image.size
   return height, width
@@ -121,7 +121,7 @@ def create_features(image_data,
     A dictionary of feature name to tf.train.Feature maaping.
   """
   if image_format not in ('jpeg', 'png'):
-    raise ValueError('Unsupported image format: %s' % image_format)
+    raise ValueError(f'Unsupported image format: {image_format}')
 
   # Check color mode, and convert grey image to rgb image.
   image = read_image(image_data)
@@ -157,12 +157,12 @@ def create_features(image_data,
       raise ValueError('Expects raw label data length %d, gets %d' %
                        (expected_label_size, len(label_data)))
   else:
-    raise ValueError('Unsupported label format: %s' % label_format)
+    raise ValueError(f'Unsupported label format: {label_format}')
 
-  feature_dict.update({
+  feature_dict |= {
       common.KEY_ENCODED_LABEL: _bytes_list_feature(label_data),
-      common.KEY_LABEL_FORMAT: _bytes_list_feature(label_format)
-  })
+      common.KEY_LABEL_FORMAT: _bytes_list_feature(label_format),
+  }
 
   return feature_dict
 
@@ -350,9 +350,7 @@ class SegmentationDecoder(object):
           parsed_tensors[common.KEY_IMAGE_HEIGHT],
           parsed_tensors[common.KEY_IMAGE_WIDTH], 1
       ])
-      label = tf.reshape(flattened_label, label_shape)
-      return label
-
+      return tf.reshape(flattened_label, label_shape)
     label = tf.io.decode_image(parsed_tensors[label_key], channels=1)
     label.set_shape([None, None, 1])
     return label
@@ -361,16 +359,13 @@ class SegmentationDecoder(object):
     parsed_tensors = tf.io.parse_single_example(
         serialized_example, features=self._keys_to_features)
     return_dict = {
-        'image':
-            self._decode_image(parsed_tensors, common.KEY_ENCODED_IMAGE),
-        'image_name':
-            parsed_tensors[common.KEY_IMAGE_FILENAME],
-        'height':
-            tf.cast(parsed_tensors[common.KEY_IMAGE_HEIGHT], dtype=tf.int32),
-        'width':
-            tf.cast(parsed_tensors[common.KEY_IMAGE_WIDTH], dtype=tf.int32),
+        'image': self._decode_image(parsed_tensors, common.KEY_ENCODED_IMAGE),
+        'image_name': parsed_tensors[common.KEY_IMAGE_FILENAME],
+        'height': tf.cast(parsed_tensors[common.KEY_IMAGE_HEIGHT],
+                          dtype=tf.int32),
+        'width': tf.cast(parsed_tensors[common.KEY_IMAGE_WIDTH], dtype=tf.int32),
+        'label': None,
     }
-    return_dict['label'] = None
     if self._decode_groundtruth_label:
       return_dict['label'] = self._decode_label(parsed_tensors,
                                                 common.KEY_ENCODED_LABEL)

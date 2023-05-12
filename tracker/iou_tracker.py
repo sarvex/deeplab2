@@ -309,7 +309,7 @@ def read_panoptic_image_2ch(path: Text, label_divisor: int) -> np.ndarray:
     image = tf.cast(tf.io.decode_image(f.read()), tf.int32).numpy()
 
   if image.shape[2] == 3 and np.any(image[..., 2] != 0):
-    raise ValueError('The input %s is not in 2 channel format.' % path)
+    raise ValueError(f'The input {path} is not in 2 channel format.')
   return image[..., 0] * label_divisor + image[..., 1]
 
 
@@ -366,7 +366,7 @@ def main(unused_args):
   # Get ground-truth files.
   for gt_sequence_folder in tf.io.gfile.glob(os.path.join(FLAGS.gt, '*')):
     tracker.reset_states()
-    color_map = dict()
+    color_map = {}
 
     sequence = os.path.basename(gt_sequence_folder)
     if FLAGS.sequence and FLAGS.sequence != sequence:

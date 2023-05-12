@@ -110,8 +110,8 @@ def _update_max_resize_value(max_resize_value, crop_size, is_inference=False):
 
   if max_resize_value[0] > crop_size[0] or max_resize_value[1] > crop_size[1]:
     raise ValueError(
-        'Maximum resize value provided (%s) exceeds model crop size (%s)' %
-        (max_resize_value, crop_size))
+        f'Maximum resize value provided ({max_resize_value}) exceeds model crop size ({crop_size})'
+    )
   return max_resize_value
 
 

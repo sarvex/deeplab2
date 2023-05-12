@@ -70,7 +70,7 @@ def _create_loss_and_weight(
         weight_key,
         top_k_percent_pixels=loss_options.top_k_percent), loss_options.weight
 
-  raise ValueError('Loss %s is not a valid loss.' % loss_options.name)
+  raise ValueError(f'Loss {loss_options.name} is not a valid loss.')
 
 
 class DeepLabFamilyLoss(tf.keras.layers.Layer):

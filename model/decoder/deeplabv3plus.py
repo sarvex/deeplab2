@@ -103,14 +103,12 @@ class DeepLabV3Plus(tf.keras.layers.Layer):
 
   @property
   def checkpoint_items(self):
-    items = {
+    return {
         common.CKPT_DEEPLABV3PLUS_ASPP: self._aspp,
-        common.CKPT_DEEPLABV3PLUS_PROJECT_CONV_BN_ACT:
-            self._project_conv_bn_act,
+        common.CKPT_DEEPLABV3PLUS_PROJECT_CONV_BN_ACT: self._project_conv_bn_act,
         common.CKPT_DEEPLABV3PLUS_FUSE: self._fuse,
         common.CKPT_SEMANTIC_LAST_LAYER: self._final_conv,
     }
-    return items
 
   def call(self, features, training=False):
     """Performs a forward pass.

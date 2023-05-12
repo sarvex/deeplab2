@@ -125,7 +125,7 @@ def _get_images(dvps_root: str, dataset_split: str) -> Sequence[str]:
   Returns:
     A list of sorted file names under dvps_root and dataset_split.
   """
-  search_files = os.path.join(dvps_root, dataset_split, '*' + _IMAGE_SUFFIX)
+  search_files = os.path.join(dvps_root, dataset_split, f'*{_IMAGE_SUFFIX}')
   filenames = tf.io.gfile.glob(search_files)
   return sorted(filenames)
 
@@ -166,7 +166,7 @@ def _get_next_frame_path(image_path: str) -> Optional[str]:
   """
   sequence_id, image_id = _get_image_info_from_path(image_path)
   next_image_id = '{:06d}'.format(int(image_id) + 1)
-  next_image_name = sequence_id + '_' + next_image_id
+  next_image_name = f'{sequence_id}_{next_image_id}'
   next_image_path = None
   for suffix in (_IMAGE_SUFFIX, _LABEL_SUFFIX):
     if image_path.endswith(suffix):

@@ -179,7 +179,7 @@ class AddAbsolutePositionalEncoding(tf.keras.layers.Layer):
                 positional_encoding_type.lower() == 'none',
                 positional_encoding_type.lower() == '2d',
                 positional_encoding_type.lower() == '1d']):
-      raise ValueError(positional_encoding_type + ' is not supported.')
+      raise ValueError(f'{positional_encoding_type} is not supported.')
     self._positional_encoding_type = positional_encoding_type
     # This initialization std is tuned for global attention, but it does not
     # seem to be a sensitive hyper-parameter, since we use batch norm on the

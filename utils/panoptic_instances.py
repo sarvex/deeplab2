@@ -55,9 +55,7 @@ def instances_without_ignore_categories(panoptic_labels: tf.Tensor,
           tf.expand_dims(instance_category, 1),
           tf.expand_dims(ignore_categories, 0)),
       axis=1)
-  instance_is_kept = tf.math.logical_not(instance_is_ignored)
-
-  return instance_is_kept
+  return tf.math.logical_not(instance_is_ignored)
 
 
 def _broadcast_over_instances(t, num_instances):
@@ -165,10 +163,7 @@ def _average_per_instance(map_tensor: tf.Tensor, panoptic_labels: tf.Tensor,
 
   # Average the semantic probabilities over each instance.
   instance_total_prob = tf.math.reduce_sum(map_or_zero, axis=[1, 2])
-  instance_avg_prob = tf.divide(instance_total_prob,
-                                tf.cast(instance_area, map_dtype))
-
-  return instance_avg_prob
+  return tf.divide(instance_total_prob, tf.cast(instance_area, map_dtype))
 
 
 # pyformat: disable
@@ -212,12 +207,12 @@ def per_instance_semantic_probabilities(
   pixel_semantic_probability = tf.where(semantic_label_map == ignore_label, 0.0,
                                         pixel_semantic_probability)
 
-  instance_avg_prob = _average_per_instance(pixel_semantic_probability,
-                                            panoptic_labels,
-                                            instance_panoptic_labels,
-                                            instance_area)
-
-  return instance_avg_prob
+  return _average_per_instance(
+      pixel_semantic_probability,
+      panoptic_labels,
+      instance_panoptic_labels,
+      instance_area,
+  )
 
 
 def combined_instance_scores(
